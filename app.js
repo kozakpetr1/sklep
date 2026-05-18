@@ -100,7 +100,7 @@ function getCategoryById(id) {
 
 function renderItems() {
   const grid = document.getElementById('itemsGrid');
-  const empty = document.getElementById('emptyState');
+  // const empty = document.getElementById('emptyState');
   const items = getFilteredItems();
 
   if (items.length === 0) {
@@ -117,7 +117,7 @@ function renderItems() {
     rooms.forEach(room => {
       const roomItems = items.filter(i => i.room === room);
       if (roomItems.length === 0) return;
-      html += `<div class="group-header">📦 Místnost ${room}</div>`;
+      html += `<div class="group-header">📦 Sklep ${room}</div>`;
       roomItems.forEach(item => { html += renderItemCard(item); });
     });
   } else {
@@ -291,7 +291,7 @@ function openDetailModal(id) {
   document.getElementById('detailBody').innerHTML = `
     <div class="detail-grid">
       <div class="detail-field">
-        <div class="detail-label">Místnost</div>
+        <div class="detail-label">Sklep</div>
         <div class="detail-value">${item.room}</div>
       </div>
       <div class="detail-field">
