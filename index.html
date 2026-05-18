@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Sklep" />
+  <title>Sklep</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="app-icon">🏚</span>
+        <h1 class="app-title">Sklep</h1>
+      </div>
+      <div class="header-right">
+        <button class="icon-btn" id="searchToggleBtn" title="Hledat">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+        </button>
+        <button class="icon-btn" id="categoriesBtn" title="Kategorie">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- SEARCH BAR -->
+    <div class="search-bar" id="searchBar">
+      <div class="search-input-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+        <input type="search" id="searchInput" placeholder="Hledat položky…" autocomplete="off" />
+        <button class="clear-search" id="clearSearch">✕</button>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-bar">
+      <div class="filter-pills" id="roomFilter">
+        <button class="pill active" data-room="all">Vše</button>
+        <button class="pill" data-room="A">Místnost A</button>
+        <button class="pill" data-room="B">Místnost B</button>
+        <button class="pill" data-room="C">Místnost C</button>
+      </div>
+      <div class="filter-secondary">
+        <select id="categoryFilter" class="mini-select">
+          <option value="all">Všechny kategorie</option>
+        </select>
+        <button class="icon-btn sm" id="expiryFilterBtn" title="Filtrovat expirující">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar" id="statsBar">
+      <span id="statsText">Načítám…</span>
+      <span class="expiry-badge hidden" id="expiryBadge">⚠ Expiruje brzy</span>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+      <div class="items-grid" id="itemsGrid">
+        <!-- Items rendered here -->
+      </div>
+      <div class="empty-state hidden" id="emptyState">
+        <div class="empty-icon">📦</div>
+        <p>Nic tu není</p>
+        <small>Přidej první položku tlačítkem níže</small>
+      </div>
+    </main>
+
+    <!-- FAB -->
+    <button class="fab" id="addItemBtn" title="Přidat položku">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
+  <!-- MODAL: Add/Edit Item -->
+  <div class="modal-overlay hidden" id="itemModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="itemModalTitle">Nová položka</h2>
+        <button class="modal-close" id="itemModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Název *</label>
+          <input type="text" id="itemName" placeholder="Název položky" maxlength="100" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Místnost *</label>
+            <select id="itemRoom">
+              <option value="A">Místnost A</option>
+              <option value="B">Místnost B</option>
+              <option value="C">Místnost C</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Regál *</label>
+            <input type="text" id="itemShelf" placeholder="č. regálu" maxlength="10" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Kategorie</label>
+          <div class="category-select-wrap">
+            <select id="itemCategory">
+              <option value="">— bez kategorie —</option>
+            </select>
+            <button class="mini-btn" id="quickAddCategoryBtn" title="Nová kategorie">+</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Množství</label>
+          <input type="text" id="itemQuantity" placeholder="např. 3 ks, 2 lahve…" maxlength="50" />
+        </div>
+        <div class="form-group">
+          <label>Datum expirace <span class="optional">(nepovinné)</span></label>
+          <input type="date" id="itemExpiry" />
+        </div>
+        <div class="form-group">
+          <label>Poznámka <span class="optional">(nepovinná)</span></label>
+          <textarea id="itemNote" placeholder="Volitelná poznámka…" rows="3" maxlength="500"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" id="itemModalCancel">Zrušit</button>
+        <button class="btn primary" id="itemModalSave">Uložit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Categories -->
+  <div class="modal-overlay hidden" id="categoriesModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Kategorie</h2>
+        <button class="modal-close" id="categoriesModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="add-category-form">
+          <input type="text" id="newCategoryName" placeholder="Název nové kategorie" maxlength="50" />
+          <div class="color-picker-row">
+            <label>Barva:</label>
+            <div class="color-swatches" id="colorSwatches"></div>
+          </div>
+          <button class="btn primary full" id="saveCategoryBtn">Přidat kategorii</button>
+        </div>
+        <div class="categories-list" id="categoriesList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" id="categoriesModalClose2">Zavřít</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Item Detail -->
+  <div class="modal-overlay hidden" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="detailTitle">Detail položky</h2>
+        <button class="modal-close" id="detailModalClose">✕</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-footer">
+        <button class="btn danger" id="detailDelete">Smazat</button>
+        <button class="btn primary" id="detailEdit">Upravit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
