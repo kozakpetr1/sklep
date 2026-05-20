@@ -3,7 +3,7 @@
  * Enables offline use as PWA
  */
 
-const CACHE_NAME = 'sklep-v1';
+const CACHE_NAME = 'sklep-v1.01';
 const ASSETS = [
   './',
   './index.html',
